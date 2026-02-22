@@ -1,0 +1,74 @@
+services:
+  # 백엔드 API
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # Backend API Server
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  api:
+    build:
+      context: ./backend
+      dockerfile: docker/Dockerfile.dev
+    container_name: vacation-api-dev
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      # 전체 프로젝트 마운트
+      - ./backend:/app
+      # Firebase 인증 정보 (읽기 전용)
+      - ./backend/credentials/serviceAccountKey.json:/app/credentials/serviceAccountKey.json:ro
+      # node_modules는 컨테이너 내부 것 사용
+      - /app/node_modules
+    networks:
+      - vacation-network
+    stdin_open: true
+    tty: true
+    #command: npm run dev
+
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # 개발용 Frontend (Vite + HMR)
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: vacation-web-dev
+    restart: unless-stopped
+    ports:
+      - "3000:5173"
+    env_file:
+      - ./frontend/.env
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - vacation-network
+    stdin_open: true
+    tty: true
+    profiles:
+      - dev
+    #command: npm run dev -- --host 0.0.0.0
+
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # 프로덕션 테스트용 Frontend (Nginx)
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  web-prod:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.nginx.dev
+    container_name: vacation-web-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    networks:
+      - vacation-network
+    depends_on:
+      - api
+    profiles:
+      - prod
+
+networks:
+  vacation-network:
+    driver: bridge
+   

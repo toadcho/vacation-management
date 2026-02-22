@@ -1,0 +1,306 @@
+{
+  "info": {
+    "_postman_id": "beef3459-a3ae-4234-8a73-289e9f194f7e",
+    "name": "Watch2 Vacation API",
+    "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52436639",
+    "_collection_link": "https://go.postman.co/collection/52436639-beef3459-a3ae-4234-8a73-289e9f194f7e?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "TEST1_Health Check",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url }}/health",
+          "host": [
+            "{{base_url }}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TEST2_Firebase 연결 테스트",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url }}/test/firebase",
+          "host": [
+            "{{base_url }}"
+          ],
+          "path": [
+            "test",
+            "firebase"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TEST3_Google Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n       \"idToken\": \"{{firebase_token}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url }}/auth/google",
+          "host": [
+            "{{base_url }}"
+          ],
+          "path": [
+            "auth",
+            "google"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TEST4_현재 사용자 정보",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url }}/auth/me",
+          "host": [
+            "{{base_url }}"
+          ],
+          "path": [
+            "auth",
+            "me"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TEST5_휴가신청",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"여름 휴가\",\r\n  \"type\": \"연차\",\r\n  \"startDate\": \"2026-07-01\",\r\n  \"endDate\": \"2026-07-03\",\r\n  \"timeSlot\": \"종일\",\r\n  \"reason\": \"여름 휴가 사용\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url }}/vacations",
+          "host": [
+            "{{base_url }}"
+          ],
+          "path": [
+            "vacations"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TEST6_내 휴가목록",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{base_url }}/vacations?status=pending&year=2026",
+          "host": [
+            "{{base_url }}"
+          ],
+          "path": [
+            "vacations"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "pending",
+              "type": "text"
+            },
+            {
+              "key": "year",
+              "value": "2026",
+              "type": "text"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TEST7_휴가취소",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url }}/vacations/hsWJrJ2LezeJK4GZJABL",
+          "host": [
+            "{{base_url }}"
+          ],
+          "path": [
+            "vacations",
+            "hsWJrJ2LezeJK4GZJABL"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TEST8_관리자-전체휴가목록",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url }}/admin/vacations?status=pending",
+          "host": [
+            "{{base_url }}"
+          ],
+          "path": [
+            "admin",
+            "vacations"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "pending"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TEST9_관리자 휴가승인",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url }}/admin/vacations/br9cKD7cHU74Y7o6Na9X/approve",
+          "host": [
+            "{{base_url }}"
+          ],
+          "path": [
+            "admin",
+            "vacations",
+            "br9cKD7cHU74Y7o6Na9X",
+            "approve"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TEST10_관리자-휴가거부",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"reason\": \"인력 부족으로 인한 거부\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url }}/admin/vacations/Pgx4EPnm1r6GVgY4uPun/reject",
+          "host": [
+            "{{base_url }}"
+          ],
+          "path": [
+            "admin",
+            "vacations",
+            "Pgx4EPnm1r6GVgY4uPun",
+            "reject"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{firebase_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+FROM node:22-alpine
+
+# 작업 디렉토리 설정
+WORKDIR /app
+
+# package.json 복사 및 의존성 설치
+COPY package*.json ./
+RUN npm install
+
+# 개발 도구 설치
+RUN npm install -g nodemon
+
+# 포트 노출
+EXPOSE 5000
+
+# 개발 서버 실행
+CMD ["npm", "run", "dev"]

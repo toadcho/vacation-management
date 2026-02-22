@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Firebase Token Generator</title>
+  <meta charset="UTF-8">
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 { color: #4285f4; }
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #4285f4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    button:hover { background: #357ae8; }
+    button:disabled { 
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 4px;
+    }
+    .success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    #token {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      word-break: break-all;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .copy-btn {
+      margin-top: 10px;
+      padding: 8px 16px;
+      font-size: 14px;
+      background: #28a745;
+    }
+    .copy-btn:hover { background: #218838; }
+    .instruction {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔑 Firebase ID Token Generator</h1>
+    <p>Watch2 휴가관리 API 테스트용 토큰 발급</p>
+    
+    <div class="instruction">
+      <strong>⚠️ 중요:</strong> 이 페이지는 <code>http://</code> 또는 <code>https://</code>로 열어야 합니다.<br>
+      간단한 방법: <code>python3 -m http.server 8000</code> 실행 후<br>
+      <code>http://localhost:8000/test-firebase-login.html</code> 접속
+    </div>
+
+    <button id="loginBtn" onclick="signInWithGoogle()">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
+           alt="Google" style="width: 20px; height: 20px;" />
+      <span>Google로 로그인</span>
+    </button>
+    
+    <div id="result"></div>
+    <div id="token"></div>
+  </div>
+
+  <script>
+    // ⚠️ Firebase 설정을 여기에 입력하세요
+    const firebaseConfig = {
+      apiKey: "AIzaSyBeq8H3fDkQpY90p6mUGUNN_o7DDXrV-2w",
+      authDomain: "watch2-vacation-management.firebaseapp.com",
+      projectId: "watch2-vacation-management",
+      storageBucket: "watch2-vacation-management.firebasestorage.app",
+      messagingSenderId: "979829228404",
+      appId: "1:979829228404:web:a4fd99a2eb08b4ba0a68a0"
+    };
+
+    // Firebase 초기화
+    try {
+      firebase.initializeApp(firebaseConfig);
+      console.log('✅ Firebase initialized');
+    } catch (error) {
+      document.getElementById('result').innerHTML = `
+        <div class="error">
+          <strong>❌ Firebase 초기화 실패:</strong><br>
+          ${error.message}
+        </div>
+      `;
+    }
+
+    async function signInWithGoogle() {
+      const loginBtn = document.getElementById('loginBtn');
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = '로그인 중...';
+
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({
+        hd: 'watch2.co.kr',
+        prompt: 'select_account'
+      }); 
+
+      try {
+        const result = await firebase.auth().signInWithPopup(provider);
+        const user = result.user;
+        const token = await user.getIdToken();
+
+        document.getElementById('result').innerHTML = `
+          <div class="success">
+            <h3>✅ 로그인 성공!</h3>
+            <p><strong>이름:</strong> ${user.displayName}</p>
+            <p><strong>이메일:</strong> ${user.email}</p>
+            <p><strong>UID:</strong> ${user.uid}</p>
+          </div>
+        `;
+
+        document.getElementById('token').innerHTML = `
+          <h4>🔑 Firebase ID Token:</h4>
+          <div style="margin: 10px 0; padding: 10px; background: white; border: 1px solid #ddd;">
+            ${token}
+          </div>
+          <button class="copy-btn" onclick="copyToken(\`${token}\`)">
+            📋 토큰 복사하기
+          </button>
+          <p style="margin-top: 15px; font-size: 12px; color: #666;">
+            ⚠️ 이 토큰을 Postman Environment의 <code>firebase_token</code> 변수에 붙여넣으세요.
+          </p>
+        `;
+
+        console.log('Token:', token);
+
+      } catch (error) {
+        let errorMessage = error.message;
+        
+        if (error.code === 'auth/operation-not-supported-in-this-environment') {
+          errorMessage = `
+            <strong>파일 프로토콜 에러</strong><br><br>
+            이 HTML 파일을 HTTP 서버로 실행해야 합니다:<br><br>
+            <code>python3 -m http.server 8000</code><br>
+            그 다음 <code>http://localhost:8000/test-firebase-login.html</code> 접속
+          `;
+        } else if (error.code === 'auth/unauthorized-domain') {
+          errorMessage = `
+            <strong>도메인 인증 에러</strong><br><br>
+            Firebase Console에서 승인된 도메인에 <code>localhost</code> 추가 필요
+          `;
+        }
+
+        document.getElementById('result').innerHTML = `
+          <div class="error">
+            <h3>❌ 로그인 실패</h3>
+            <p>${errorMessage}</p>
+            <details style="margin-top: 10px;">
+              <summary>기술 정보</summary>
+              <pre style="font-size: 11px;">${JSON.stringify(error, null, 2)}</pre>
+            </details>
+          </div>
+        `;
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = `
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
+               alt="Google" style="width: 20px; height: 20px;" />
+          <span>Google로 로그인</span>
+        `;
+      }
+    }
+
+    function copyToken(token) {
+      navigator.clipboard.writeText(token).then(() => {
+        alert('✅ 토큰이 클립보드에 복사되었습니다!\n\nPostman에서 Environment 변수에 붙여넣으세요.');
+      }).catch(err => {
+        console.error('복사 실패:', err);
+        prompt('토큰을 수동으로 복사하세요:', token);
+      });
+    }
+
+    // 프로토콜 체크
+    if (window.location.protocol === 'file:') {
+      document.getElementById('result').innerHTML = `
+        <div class="error">
+          <h3>⚠️ 잘못된 실행 방법</h3>
+          <p>이 파일을 직접 열면 Firebase 인증이 작동하지 않습니다.</p>
+          <p><strong>해결 방법:</strong></p>
+          <ol style="text-align: left;">
+            <li>터미널에서 이 파일이 있는 폴더로 이동</li>
+            <li><code>python3 -m http.server 8000</code> 실행</li>
+            <li>브라우저에서 <code>http://localhost:8000/test-firebase-login.html</code> 접속</li>
+          </ol>
+        </div>
+      `;
+      document.getElementById('loginBtn').disabled = true;
+    }
+  </script>
+</body>
+</html>
