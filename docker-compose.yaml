@@ -29,7 +29,7 @@ services:
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   # 개발용 Frontend (Vite + HMR)
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  web:
+  web-dev:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
@@ -42,8 +42,12 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # ← 호스트 접근 허용  
     networks:
       - vacation-network
+    depends_on: # API 서버가 먼저 시작되도록 설정
+      - api
     stdin_open: true
     tty: true
     profiles:
@@ -60,10 +64,10 @@ services:
     container_name: vacation-web-nginx
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "8200:80"
     networks:
       - vacation-network
-    depends_on:
+    depends_on: # API 서버가 먼저 시작되도록 설정
       - api
     profiles:
       - prod

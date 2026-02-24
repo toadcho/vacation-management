@@ -213,6 +213,7 @@ docker-compose --profile prod logs -f
 
 # 접속
 # http://localhost:8080
+
 둘 다 실행
 bash# 개발 + 프로덕션 테스트 동시 실행
 docker-compose --profile dev --profile prod up -d
@@ -275,6 +276,8 @@ docker-compose --profile prod logs -f
 
 # 완료 후
 docker-compose --profile prod down
+
+
 시나리오 3: 동시 비교
 bash# 개발 + 프로덕션 동시 실행
 docker-compose --profile dev --profile prod up -d

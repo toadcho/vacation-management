@@ -7,7 +7,12 @@ WORKDIR /app
 COPY package*.json ./
 
 # 의존성 설치 ( 개발용 ), 배포용은 npm ci 사용
-RUN npm install
+# RUN npm install
+RUN npm ci
+
+
+# .env 파일 복사
+COPY .env ./.env
 
 # 소스 복사 및 빌드
 COPY . .
